@@ -5,7 +5,6 @@
 
 `wasm-pack build --target web`
 `dir pkg`
-`Copy the necessary files`
 `copy pkg\*.js .`
 `copy pkg\*.wasm .`
 
