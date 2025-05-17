@@ -2,10 +2,6 @@
 
 A web application that uses WebAssembly (Wasm) and word embeddings to translate regular text into relevant emojis. The translator finds semantic connections between your words and emoji keywords using GloVe (Global Vectors for Word Representation) embeddings.
 
-## ✨ Demo
-
-![Emoji Translator Demo](https://github.com/gorgcm/some/raw/main/demo.gif)
-
 Try it live at: [https://gorgcm.github.io/some](https://gorgcm.github.io/some)
 
 ## 🧠 How It Works
