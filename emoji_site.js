@@ -79,11 +79,6 @@ function takeFromExternrefTable0(idx) {
     wasm.__externref_table_dealloc(idx);
     return value;
 }
-
-export function start() {
-    wasm.start();
-}
-
 /**
  * @returns {number}
  */
