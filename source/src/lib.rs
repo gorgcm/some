@@ -19,23 +19,22 @@ impl EmojiTranslator {
     }
 
     pub fn initialize(&mut self, glove_data: &str, emoji_json: &str) -> Result<(), JsValue> {
-        // Load embeddings
+
         self.load_glove_embeddings(glove_data)
             .map_err(|e| JsValue::from_str(&e))?;
-        
-        // Load emoji keywords
+
         self.load_emoji_keywords(emoji_json)
             .map_err(|e| JsValue::from_str(&e))?;
-        
+
         Ok(())
     }
 
     fn load_glove_embeddings(&mut self, data: &str) -> Result<(), String> {
         let lines = data.lines();
-        
+
         for line in lines {
             let parts: Vec<&str> = line.split_whitespace().collect();
-            
+
             if parts.len() > 1 {
                 if let Some(word) = parts.first() {
                     let values = &parts[1..];
@@ -43,21 +42,20 @@ impl EmojiTranslator {
                         .iter()
                         .filter_map(|s| s.parse::<f32>().ok())
                         .collect();
-                    
+
                     if !vector.is_empty() {
                         self.embeddings.insert(word.to_string(), vector);
                     }
                 }
             }
         }
-        
         Ok(())
     }
 
     fn load_emoji_keywords(&mut self, json_str: &str) -> Result<(), String> {
         let json: Value = serde_json::from_str(json_str)
             .map_err(|e| format!("Error parsing JSON: {}", e))?;
-        
+
         if let Value::Object(map) = json {
             for (emoji, keywords) in map {
                 if let Value::Array(keyword_array) = keywords {
@@ -65,12 +63,11 @@ impl EmojiTranslator {
                         .iter()
                         .filter_map(|k| k.as_str().map(String::from))
                         .collect();
-                    
+
                     self.emoji_keywords.insert(emoji, keywords_vec);
                 }
             }
         }
-        
         Ok(())
     }
 
@@ -80,15 +77,15 @@ impl EmojiTranslator {
     }
 
     fn cosine_similarity(&self, a: &[f32], b: &[f32]) -> f32 {
-        // Make sure vectors are same length
+
         if a.len() != b.len() || a.is_empty() {
             return 0.0;
         }
-        
+
         let dot_product: f32 = a.iter().zip(b.iter()).map(|(x, y)| x * y).sum();
         let norm_a = a.iter().map(|x| x * x).sum::<f32>().sqrt();
         let norm_b = b.iter().map(|x| x * x).sum::<f32>().sqrt();
-        
+
         match (norm_a, norm_b) {
             (0.0, _) | (_, 0.0) => 0.0,
             _ => dot_product / (norm_a * norm_b)
@@ -98,55 +95,40 @@ impl EmojiTranslator {
     fn process_text(&self, text: &str) -> String {
         let words: Vec<&str> = text.split_whitespace().collect();
         let mut result: Vec<String> = Vec::with_capacity(words.len());
-        
-        // Process each word to find the best emoji match
+
         for word in words.iter() {
             let word_lc = word.to_lowercase();
             let mut best_match: Option<(String, f32)> = None;
-            
+
             if let Some(word_vec) = self.embeddings.get(&word_lc) {
                 for (emoji, keywords) in &self.emoji_keywords {
                     for kw in keywords {
                         if let Some(kw_vec) = self.embeddings.get(kw) {
                             let sim = self.cosine_similarity(word_vec, kw_vec);
-                            
-                            // Check if this is the best match so far
+
                             if sim > 0.5 && (best_match.is_none() || sim > best_match.as_ref().unwrap().1) {
                                 best_match = Some((emoji.clone(), sim));
                             }
                         }
                     }
                 }
-                
-                // Only add the emoji if found, skip words without matches
+
                 if let Some((emoji, _)) = best_match {
                     result.push(emoji);
                 }
-                // No else clause - we don't add words without emoji matches
             }
-            // No else clause - we skip words without embeddings
         }
-        
         result.join(" ")
     }
 
     fn filter_text(&self, text: &str) -> String {
-        // Allow letters, numbers, and whitespace
         text.chars()
             .filter(|c| c.is_alphanumeric() || c.is_whitespace() || c == &'.')
             .collect()
     }
 }
 
-// Initialize the console error panic hook for better error messages
-#[wasm_bindgen(start)]
-pub fn start() {
-    // Future enhancement: Add console_error_panic_hook
-}
-
-// This function needed for initialization
 #[wasm_bindgen]
 pub fn initialize() -> i32 {
-    // Just return a success code
     0
 }
