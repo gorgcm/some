@@ -23,11 +23,11 @@ This application uses natural language processing techniques to find semantic si
 ## 📦 Project Structure
 
 ```
-emoji-translator/
+some/
 ├── src/
 │   └── lib.rs           # Rust code for the translator
 ├── static/
-│   ├── emoji.json       # Emoji to keywords mapping
+│   ├── emoji.json       # Emoji to keywords mapping (from emojilib)
 │   └── glove.txt        # GloVe word embeddings
 ├── Cargo.toml           # Rust package configuration
 ├── build.sh            # Build script
@@ -48,14 +48,14 @@ emoji-translator/
 1. Clone this repository:
    ```
    git clone https://github.com/gorgcm/some.git
-   cd some
+   cd emoji-translator
    ```
 
 2. Download the required data files:
 
    You'll need:
    - `glove.txt`: A subset of GloVe word embeddings (we recommend the 50-dimensional version)
-   - `emoji.json`: A mapping of emojis to related keywords
+   - `emoji.json`: Get this from [emojilib](https://github.com/muan/emojilib) (`emoji.json` file)
 
    Place these files in the `static/` directory.
 
@@ -83,7 +83,7 @@ emoji-translator/
 
 ### emoji.json
 
-A JSON file mapping emoji characters to arrays of related keywords:
+This project uses [emojilib](https://github.com/muan/emojilib) for emoji data. It's a JSON file mapping emoji characters to arrays of related keywords:
 
 ```json
 {
@@ -142,5 +142,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🙏 Acknowledgments
 
 - [GloVe](https://nlp.stanford.edu/projects/glove/) for the word embeddings
+- [emojilib](https://github.com/muan/emojilib) by [@muan](https://github.com/muan) for the emoji keyword data
 - [Rust WebAssembly Working Group](https://github.com/rustwasm) for `wasm-bindgen` and related tools
 - All emoji creators and standardization committees!
