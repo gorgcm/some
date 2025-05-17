@@ -118,7 +118,7 @@
                 console.log("WASM module loaded");
 
                 console.log("Loading GloVe embeddings...");
-                const gloveData = await loadData('static/glove.6B.50d.txt');
+                const gloveData = await loadData('static/glove.txt');
                 console.log("GloVe embeddings loaded, length:", gloveData.length);
 
                 setProgress(70);
